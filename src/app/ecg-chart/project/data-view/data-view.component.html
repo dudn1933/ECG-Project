@@ -1,0 +1,6 @@
+<div class="dataViewBox">
+    <app-section [data]='dataArray' (onRangeIndex)="changeIndexNumber($event)" (lastIndex)="lastIndex($event)"></app-section>
+    <app-view-controller [data]='dataArray' (onPlayIndex)="onPlayIndex($event)" [lastIndex]="lastIndexNumber"></app-view-controller>
+    <app-ecg [data]='dataArray' [changeIndex]="index"></app-ecg>
+    <app-respiration></app-respiration>
+</div>

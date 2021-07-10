@@ -1,0 +1,12 @@
+.ecg {
+  position: relative;
+  width: 100%;
+  height: 32.5vh;
+  border: 1px solid black;
+  margin-top: 1rem;
+
+  svg {
+    position: absolute;
+    left: 0;
+  }
+}

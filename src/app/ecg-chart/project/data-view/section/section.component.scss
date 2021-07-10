@@ -1,0 +1,24 @@
+.sectionBox {
+  position: relative;
+  width: 100%;
+  height: 10vh;
+  border: 1px solid black;
+}
+
+.section {
+  position: absolute;
+  width: 100%;
+  height: 10vh;
+}
+
+.range-slider {
+  position: absolute;
+  z-index: 100;
+  width: 100%;
+  height: 10vh;
+  overflow: visible;
+
+  svg {
+    overflow: visible;
+  }
+}
