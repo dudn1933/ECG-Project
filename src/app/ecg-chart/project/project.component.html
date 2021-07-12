@@ -1,0 +1,5 @@
+<app-header class="header" [dataArray]='data[clickNumber]'></app-header>
+<div class="box">
+    <app-data-list class="data-list" [data]='data' (onClickNumber)="clickNumberRegister($event)" ></app-data-list>
+    <app-data-view class="data-view" [dataArray]='data[clickNumber]'></app-data-view>
+</div>

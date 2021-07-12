@@ -1,0 +1,6 @@
+<div class="dataListBox">
+    <div class="list" *ngFor='let list of lists' (click)="clickNumberRegister(list.index)" >
+        <div>{{list.index}}</div>
+        <div>{{calcTime(list.startTime, list.endTime)}}</div>
+    </div>
+</div>

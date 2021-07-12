@@ -16,18 +16,19 @@ import * as d3 from 'd3';
 })
 export class SectionComponent implements OnInit,OnChanges {
   @Input() data: any = [];
+  @Input() test: any;
 
   dataArray: any;
-  startTime: number;
-  endTime: number;
+
+  index:number[] = [];
 
   @Output() onRangeIndex = new EventEmitter<[number, number]>(); // brush의 첫값과 마지막 값으로 보여주는 chart 범위 조절하기.
   @Output() lastIndex = new EventEmitter<number>();
 
+  startIndex: number = 0;
+  endIndex: number = 0;
   constructor() {
     this.dataArray = [];
-    this.startTime = 0;
-    this.endTime = 0;
   }
 
   ngOnInit(): void {
@@ -35,15 +36,26 @@ export class SectionComponent implements OnInit,OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
-    //Add '${implements OnChanges}' to the class.
-    console.log("section : ",changes)
-    if (changes.data.previousValue) {
-      this.dataArray = this.data.data;
-      this.startTime = this.data.start;
-      this.endTime = this.data.end;
-      this.sectionDrawChart();
-      this.slider(0, this.data.data.length);
-    }
+    //Add '${implements OnChanges}' to the class.  
+
+    this.dataArray = this.data.data;
+    this.endIndex = this.data.data.length;
+    this.remove();
+    this.sectionDrawChart();
+    this.slider(this.startIndex, this.endIndex);
+    
+    const timer = setInterval(() => {
+      if (this.test) {
+        this.remove();
+        this.sectionDrawChart();
+        this.slider(this.startIndex + 1, this.endIndex + 1);
+      } else {
+        clearInterval(timer);
+        this.remove();
+        this.sectionDrawChart();
+        this.slider(this.startIndex, this.endIndex);
+      }
+    })
   }
 
   sectionDrawChart() {
@@ -63,25 +75,36 @@ export class SectionComponent implements OnInit,OnChanges {
 
     const myLine: any = d3
       .line()
+      .defined((d: any) => !isNaN(d.ecg))
       .x((d: any) => xScale(d.ts))
       .y((d: any) => yScale(d.ecg));
 
     svg
       .append('path')
+      .datum(this.dataArray.filter(myLine.defined()))
+      .attr('fill', 'none')
+      .attr('stroke-width', '.5px')
+      .attr('stroke', 'white')
+      .attr('d', myLine);
+      
+    
+    svg
+      .append('path')
       .datum(this.dataArray)
       .attr('fill', 'none')
-      .attr('stroke-width', '1.5px')
+      .attr('stroke-width', '.5px')
       .attr('stroke', 'blue')
       .attr('d', myLine);
   }
 
   slider(min: number, max: number) {
+    const onMove = this.test;
     const range = [min, max];
     const width: any = document.querySelector('.range-slider')?.clientWidth;
     const height: any = document.querySelector('.range-slider')?.clientHeight;
-    const margin = { top: 10, bottom: 10, left: 10, right: 10 };
 
     const x = d3.scaleLinear().domain(range).range([0, width]);
+    
 
     const svg: any = d3.select('.range-slider');
     svg
@@ -94,6 +117,9 @@ export class SectionComponent implements OnInit,OnChanges {
       //브러쉬 인덱스값 전달.
       this.onRangeIndex.emit([min, max]);
       this.lastIndex.emit(max);
+      this.startIndex = min;
+      this.endIndex = max;
+      console.log(this.startIndex,this.endIndex)
     };
 
     const brush = d3
@@ -103,7 +129,9 @@ export class SectionComponent implements OnInit,OnChanges {
         [width, height],
       ])
       .on('brush', function (event) {
-        const s = event.selection;
+        let s = event.selection;
+
+        // console.log(x.invert(s[0]),x.invert(s[1]));
         indexRegister(
           Number(x.invert(s[0]).toFixed(0)),
           Number(x.invert(s[1]).toFixed(0))
@@ -113,15 +141,16 @@ export class SectionComponent implements OnInit,OnChanges {
         handle
           .attr('display', null)
           .attr('transform', function (d: any, i: any) {
-            return 'translate(' + [s[i], -height / 4] + ')';
+            return `translate(${[s[i], -height / 4]})`;
           });
         // update view
         // if the view should only be updated after brushing is over,
         // move these two lines into the on('end') part below
         svg.node().value = s.map(function (d: any) {
-          var temp = x.invert(d);
-          return +temp.toFixed(2);
+              var temp = x.invert(d);
+              return +temp.toFixed(0);
         });
+        
         svg.node().dispatchEvent(new CustomEvent('input'));
       });
 
@@ -198,5 +227,16 @@ export class SectionComponent implements OnInit,OnChanges {
     gBrush.call(brush.move, range.map(x));
 
     return svg.node();
+  }
+
+  remove() {
+    const sectionDOM:any = document.querySelector('.section');
+    if (sectionDOM?.hasChildNodes()) {
+      sectionDOM.removeChild(sectionDOM.firstChild);
+    }
+    const rangeDOM:any = document.querySelector(".range-slider");
+    if(rangeDOM.hasChildNodes()) {
+      rangeDOM.removeChild(rangeDOM.firstChild);
+    }
   }
 }

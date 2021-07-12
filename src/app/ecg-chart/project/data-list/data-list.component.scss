@@ -1,0 +1,19 @@
+.dataListBox {
+  width: 100%;
+  height: 90vh;
+
+  .list {
+    padding: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid black;
+
+    div {
+      &:last-child {
+        padding-left: 2rem;
+      }
+    }
+  }
+}

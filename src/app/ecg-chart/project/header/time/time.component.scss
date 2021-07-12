@@ -1,0 +1,9 @@
+.timeBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > div {
+    padding-left: 5rem;
+  }
+}

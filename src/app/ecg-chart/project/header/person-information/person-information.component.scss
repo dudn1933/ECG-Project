@@ -1,0 +1,9 @@
+.personBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  > div {
+    text-align: left;
+    padding-left: 2rem;
+  }
+}

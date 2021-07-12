@@ -1,0 +1,18 @@
+.aside {
+  background-color: rgb(114, 114, 255);
+}
+
+.headerBox {
+  width: 100%;
+  background-color: rgb(46, 46, 153);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  app-person-information {
+    width: 50%;
+  }
+  app-time {
+    width: 50%;
+  }
+}

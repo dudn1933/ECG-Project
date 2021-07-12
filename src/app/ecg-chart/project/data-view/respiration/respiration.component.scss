@@ -1,6 +1,34 @@
-.respiration {
+.respirationBox {
+  position: relative;
   width: 100%;
   height: 32.5vh;
   border: 1px solid black;
   margin-top: 1rem;
+}
+
+.respiration {
+  position: absolute;
+  width: 100%;
+  height: 32.5vh;
+  padding-left: 40px;
+  box-sizing: border-box;
+
+  svg {
+    position: absolute;
+    box-sizing: border-box;
+
+    path {
+      box-sizing: border-box;
+    }
+  }
+}
+
+.respirationAxis {
+  position: absolute;
+  width: 100%;
+  height: 32.5vh;
+
+  svg {
+    position: absolute;
+  }
 }
