@@ -88,6 +88,9 @@ export class ProjectComponent implements OnInit {
     this.http.get(`../../../assets/json/4.json`).subscribe((array) => {
       this.data[4] = this.recombination(array);
     });
+    // this.http.get(`../../../assets/json/5.json`).subscribe((array) => {
+    //   this.data[5] = this.recombination(array);
+    // });
   }
 
   clickNumberRegister(value: number) {

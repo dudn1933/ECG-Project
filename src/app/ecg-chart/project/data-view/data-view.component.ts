@@ -13,7 +13,7 @@ export class DataViewComponent implements OnInit {
   index:any;
   lastIndexNumber:any;
 
-  test: any;
+  test: any; // play true false 조절 변수.
   
   constructor() {
     this.changeIndex = [0, 0];
@@ -43,9 +43,6 @@ export class DataViewComponent implements OnInit {
   }
 
   onPlayTest(value:boolean) {
-    // this.index = [this.index[0] + value[0], this.index[1] + value[1]];
-    // const newDate = new Date().getSeconds();
-    // console.log(newDate)
     this.test = value;
   }
 

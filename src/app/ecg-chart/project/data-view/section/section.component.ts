@@ -27,6 +27,7 @@ export class SectionComponent implements OnInit,OnChanges {
 
   startIndex: number = 0;
   endIndex: number = 0;
+
   constructor() {
     this.dataArray = [];
   }
@@ -37,25 +38,15 @@ export class SectionComponent implements OnInit,OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     //Called before any other lifecycle hook. Use it to inject dependencies, but avoid any serious work here.
     //Add '${implements OnChanges}' to the class.  
+    if (changes.data.previousValue) {
+      this.dataArray = this.data.data;
+      console.log(this.dataArray.length)
+      this.endIndex = this.data.data.length;
+      this.remove();
+      this.sectionDrawChart();
+      this.slider(this.startIndex, this.endIndex);
+    }
 
-    this.dataArray = this.data.data;
-    this.endIndex = this.data.data.length;
-    this.remove();
-    this.sectionDrawChart();
-    this.slider(this.startIndex, this.endIndex);
-    
-    const timer = setInterval(() => {
-      if (this.test) {
-        this.remove();
-        this.sectionDrawChart();
-        this.slider(this.startIndex + 1, this.endIndex + 1);
-      } else {
-        clearInterval(timer);
-        this.remove();
-        this.sectionDrawChart();
-        this.slider(this.startIndex, this.endIndex);
-      }
-    })
   }
 
   sectionDrawChart() {
@@ -95,10 +86,12 @@ export class SectionComponent implements OnInit,OnChanges {
       .attr('stroke-width', '.5px')
       .attr('stroke', 'blue')
       .attr('d', myLine);
+    
+    // d3.select(".range-slider")
   }
 
   slider(min: number, max: number) {
-    const onMove = this.test;
+    let brushIndex: number[] = [];
     const range = [min, max];
     const width: any = document.querySelector('.range-slider')?.clientWidth;
     const height: any = document.querySelector('.range-slider')?.clientHeight;
@@ -114,13 +107,34 @@ export class SectionComponent implements OnInit,OnChanges {
     const g = svg.append('g');
 
     const indexRegister = (min: number, max: number) => {
+
+      console.log(min, max);
+      
       //브러쉬 인덱스값 전달.
       this.onRangeIndex.emit([min, max]);
       this.lastIndex.emit(max);
       this.startIndex = min;
       this.endIndex = max;
-      console.log(this.startIndex,this.endIndex)
     };
+
+    const targetDomObserve: any = document.querySelector('.range-slider');
+
+    const observer = new MutationObserver(() => {
+      const selection: any = d3.select('.selection');
+      const overlay: any = d3.select('.overlay');
+      const selectionWidth = selection.node().getBoundingClientRect().width;
+      let selectionLeftX = selection.node().getBoundingClientRect().left;
+      let overlayLeftX = overlay.node().getBoundingClientRect().left;
+      let selectionRightX = selectionLeftX + selectionWidth;
+
+      indexRegister(
+          Number(x.invert(selectionLeftX-overlayLeftX).toFixed(0)),
+          Number(x.invert(selectionRightX-overlayLeftX).toFixed(0))
+      );
+    });
+    
+    observer.observe(targetDomObserve, { subtree: true, childList: true, attributes: true });
+      
 
     const brush = d3
       .brushX()
@@ -130,101 +144,27 @@ export class SectionComponent implements OnInit,OnChanges {
       ])
       .on('brush', function (event) {
         let s = event.selection;
-
-        // console.log(x.invert(s[0]),x.invert(s[1]));
-        indexRegister(
-          Number(x.invert(s[0]).toFixed(0)),
-          Number(x.invert(s[1]).toFixed(0))
-        );
-    
-        // move brush handles
-        handle
-          .attr('display', null)
-          .attr('transform', function (d: any, i: any) {
-            return `translate(${[s[i], -height / 4]})`;
-          });
-        // update view
-        // if the view should only be updated after brushing is over,
-        // move these two lines into the on('end') part below
-        svg.node().value = s.map(function (d: any) {
-              var temp = x.invert(d);
-              return +temp.toFixed(0);
+        d3.select(".play").on("click", () => {
+          const selection: any = d3.select('.selection');
+          const selectionWidth = selection.node().getBoundingClientRect().width;
+          return selection.transition().duration(50000).ease(d3.easeLinear).attr("x", width - selectionWidth);
         });
-        
-        svg.node().dispatchEvent(new CustomEvent('input'));
+
+        d3.select('.stop').on("click", () => {
+          console.log("스탑");
+          const selection: any = d3.select('.selection');
+          const overlay: any = d3.select('.overlay');
+          let selectionLeftX = selection.node().getBoundingClientRect().left;
+          let overlayLeftX = overlay.node().getBoundingClientRect().left;
+          const selectionX: any = selectionLeftX - overlayLeftX;
+          return selection.transition().duration(0).ease(d3.easeLinear).attr('x', selectionX);
+        });
       });
 
     const gBrush = g.append('g').attr('class', 'brush').call(brush);
-
-    var brushResizePath = function (d: any) {
-      var e = +(d.type == 'e'),
-        x = e ? 1 : -1,
-        y = height / 2;
-      return (
-        'M' +
-        0.5 * x +
-        ',' +
-        y +
-        'A6,6 0 0 ' +
-        e +
-        ' ' +
-        6.5 * x +
-        ',' +
-        (y + 6) +
-        'V' +
-        (2 * y - 6) +
-        'A6,6 0 0 ' +
-        e +
-        ' ' +
-        0.5 * x +
-        ',' +
-        2 * y +
-        'Z' +
-        'M' +
-        2.5 * x +
-        ',' +
-        (y + 8) +
-        'V' +
-        (2 * y - 8) +
-        'M' +
-        4.5 * x +
-        ',' +
-        (y + 8) +
-        'V' +
-        (2 * y - 8)
-      );
-    };
-    const handle = gBrush
-      .selectAll('.handle--custom')
-      .data([{ type: 'w' }, { type: 'e' }])
-      .enter()
-      .append('path')
-      .attr('class', 'handle--custom')
-      .attr('stroke', '#000')
-      .attr('fill', '#eee')
-      .attr('cursor', 'ew-resize')
-      .attr('d', brushResizePath);
-
-    gBrush
-      .selectAll('.overlay')
-      .each(function (d: any) {
-        d.type = 'selection';
-      })
-      .on('mousedown touchstart', brushcentered);
-
-    function brushcentered(): void {
-      var dx = x(1) - x(0), // Use a fixed width when recentering.
-        cx = d3.pointer(svg)[0],
-        x0 = cx - dx / 2,
-        x1 = cx + dx / 2;
-      d3.select(svg.parentNode).call(
-        brush.move,
-        x1 > width ? [width - dx, width] : x0 < 0 ? [0, dx] : [x0, x1]
-      );
-    }
-
+  
     // select entire range
-    gBrush.call(brush.move, range.map(x));
+    gBrush.call(brush.move, range.map(x))
 
     return svg.node();
   }

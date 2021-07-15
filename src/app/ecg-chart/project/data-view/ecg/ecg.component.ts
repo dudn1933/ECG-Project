@@ -26,26 +26,19 @@ export class EcgComponent implements OnInit,OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    !this.test && (this.dataArray = this.data.data.slice(this.changeIndex[0], this.changeIndex[1] - 1));
-    console.log(this.changeIndex[0],this.changeIndex[1])
-    const timer = setInterval(() => {
-      if (this.test) {
-        // this.dataArray = this.data.data.slice(this.changeIndex[1]-1+1)
-        this.dataArray.push(this.data.data[this.changeIndex[1]]);
-        this.dataArray.pop();
-        this.remove();
-        this.ecgDrawChart();
-      } else {
-        clearInterval(timer);
-      }
-    }, 40);
-    this.dataArray.pop();
+    // !this.test && (
+      this.dataArray = this.data.data.slice(this.changeIndex[0], this.changeIndex[1]);
+    // console.log(this.data)
+    // this.dataArray = this.data;
+    // this.dataArray.push(this.data.data[this.changeIndex[1]]);
+    // this.dataArray.shift();
     this.remove();
     this.ecgDrawChart();
   }
   
 
   ecgDrawChart() {
+    // d3.selectAll('svg').remove();
     const ecgSvg = d3.select('.ecg').append('svg');
     const boxHeight:any = document.querySelector('.ecgBox')?.clientHeight;
     const width: any = document.querySelector('.ecg')?.clientWidth;

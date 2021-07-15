@@ -1,7 +1,8 @@
-<div class="dataViewBox">
-                                                                                    <!-- changeIndex가 있으면 동작안될 수 도 있음.  -->
+<div class="dataViewBox">                                                                                 <!-- changeIndex가 있으면 동작안될 수 도 있음.  -->
     <app-section [data]='dataArray' (onRangeIndex)="changeIndexNumber($event)" (lastIndex)="lastIndex($event)" [test]="test"></app-section> 
-    <app-view-controller [data]='dataArray' (onPlayTest)="onPlayTest($event)" [lastIndex]="lastIndexNumber"></app-view-controller>
+    <app-view-controller [data]='dataArray' (onPlayTest)="onPlayTest($event)" [lastIndex]="lastIndexNumber" ></app-view-controller>
+    <!-- <app-ecg [data]='ecgViewData' [test]="test"></app-ecg>
+    <app-respiration [data]='resViewData' [test]="test"></app-respiration> -->
     <app-ecg [data]='dataArray' [changeIndex]="index" [test]="test"></app-ecg>
-    <!-- <app-respiration [data]='dataArray' [changeIndex]="index" ></app-respiration> -->
+    <app-respiration [data]='dataArray' [changeIndex]="index" [test]="test"></app-respiration>
 </div>
