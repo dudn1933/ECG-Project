@@ -8,6 +8,7 @@ import {
   OnChanges,
 } from '@angular/core';
 import * as d3 from 'd3';
+import { selection } from 'd3';
 
 @Component({
   selector: 'app-section',
@@ -40,7 +41,7 @@ export class SectionComponent implements OnInit,OnChanges {
     //Add '${implements OnChanges}' to the class.  
     if (changes.data.previousValue) {
       this.dataArray = this.data.data;
-      console.log(this.dataArray.length)
+      // console.log(this.dataArray.length)
       this.endIndex = this.data.data.length;
       this.remove();
       this.sectionDrawChart();
@@ -108,7 +109,7 @@ export class SectionComponent implements OnInit,OnChanges {
 
     const indexRegister = (min: number, max: number) => {
 
-      console.log(min, max);
+      // console.log(min, max);
       
       //브러쉬 인덱스값 전달.
       this.onRangeIndex.emit([min, max]);
@@ -146,8 +147,16 @@ export class SectionComponent implements OnInit,OnChanges {
         let s = event.selection;
         d3.select(".play").on("click", () => {
           const selection: any = d3.select('.selection');
+          const overlay: any = d3.select('.overlay');
           const selectionWidth = selection.node().getBoundingClientRect().width;
-          return selection.transition().duration(50000).ease(d3.easeLinear).attr("x", width - selectionWidth);
+          let selectionLeftX = selection.node().getBoundingClientRect().left;
+          let overlayRightX = overlay.node().getBoundingClientRect().right;
+          let durationLength: any = Number(x.invert(overlayRightX - selectionLeftX).toFixed(0));
+          console.log(durationLength)
+
+          // 우측 끝값과 section 우측 끝값을 계산해서 x.invert 를 해서 max 값에 넣어주기.
+
+          return selection.transition().duration(8*durationLength).ease(d3.easeLinear).attr("x", width - selectionWidth);
         });
 
         d3.select('.stop').on("click", () => {
@@ -159,6 +168,15 @@ export class SectionComponent implements OnInit,OnChanges {
           const selectionX: any = selectionLeftX - overlayLeftX;
           return selection.transition().duration(0).ease(d3.easeLinear).attr('x', selectionX);
         });
+
+        d3.select('.brush').on('click', () => {
+          const selection: any = d3.select('.selection');
+          const overlay: any = d3.select('.overlay');
+          let selectionLeftX = selection.node().getBoundingClientRect().left;
+          let overlayLeftX = overlay.node().getBoundingClientRect().left;
+          const selectionX: any = selectionLeftX - overlayLeftX;
+          return selection.transition().duration(0).ease(d3.easeLinear).attr('x', selectionX);
+        })
       });
 
     const gBrush = g.append('g').attr('class', 'brush').call(brush);

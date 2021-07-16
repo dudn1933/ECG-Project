@@ -1,7 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import * as d3 from 'd3';
-import { timeHours } from 'd3';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-ecg',
@@ -17,6 +15,8 @@ export class EcgComponent implements OnInit,OnChanges {
   saveArray: any;
   count: number = 5;
 
+  rangeIndex: number = 0;
+
   constructor() {
     this.dataArray = [];
   }
@@ -26,14 +26,40 @@ export class EcgComponent implements OnInit,OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // !this.test && (
+    // if (!this.test) {
+    //   this.dataArray = this.data.data.slice(this.changeIndex[0], this.changeIndex[1]);
+    //   this.remove();
+    //   this.ecgDrawChart();
+    // } else {
+    //   this.dataArray.push(this.data.data[this.changeIndex[1]]);
+    //   this.dataArray.shift();
+    //   console.log(this.dataArray.length)
+    //   this.remove();
+    //   this.ecgDrawChart();
+    // }
+    // if (this.test) {
+    //   this.dataArray.push(this.data.data[this.changeIndex[1] + 1]);
+    //   console.log(1, this.dataArray[this.dataArray.length - 1].ts - this.dataArray[0].ts);
+    //   console.log(2, this.rangeIndex)
+    //   while (this.dataArray[this.dataArray.length-1].ts - this.dataArray[0].ts !== this.rangeIndex) {
+    //     this.dataArray.shift();
+    //   }
+      
+    //   this.remove();
+    //   this.ecgDrawChart();
+    // } else if (!this.test) {
       this.dataArray = this.data.data.slice(this.changeIndex[0], this.changeIndex[1]);
-    // console.log(this.data)
-    // this.dataArray = this.data;
-    // this.dataArray.push(this.data.data[this.changeIndex[1]]);
-    // this.dataArray.shift();
-    this.remove();
-    this.ecgDrawChart();
+    //   this.rangeIndex = this.dataArray[this.dataArray.length-1].ts - this.dataArray[0].ts
+    //   console.log(this.rangeIndex)
+      this.remove()
+      this.ecgDrawChart();
+    // }
+    
+    // for (let i = 0; i < this.data.data.length; i++) {
+    //   if (this.data.data[i].ts === undefined) {
+    //     console.log(i);
+    //   };
+    // }
   }
   
 
@@ -53,7 +79,7 @@ export class EcgComponent implements OnInit,OnChanges {
     xScale.domain(d3.extent(this.dataArray, (d: any) => d.ts));
     const yScale: any = d3
       .scaleLinear()
-      .range([height - margin.bottom, margin.top]);
+      .range([height-2 - margin.bottom, margin.top]);
     yScale.domain(d3.extent(this.dataArray, (d: any) => d.ecg));
 
     const xAxis = d3.axisBottom(xScale);

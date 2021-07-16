@@ -27,51 +27,61 @@ export class ProjectComponent implements OnInit {
     // }
     const ecgArray:any[] = [];
     const respiration:any[] = [];
-    let tsArray: any = [];
+    let ecgTsArray: any = [];
+    let resTsArray: any = [];
     let startTs = data[0].ts;
 
     for(let i=0; i < data.length-1; i++) {
       if(data[i].index+1 === data[i+1].index && data[i+1].ts-data[i].ts < 100) {
         if(data[i].dp !== undefined) {
           ecgArray.push(...data[i].dp.ecg);
-          for(let count=0; count<5; count++) {
+          // for(let count=0; count<5; count++) {
             respiration.push(data[i].dp.F1);
-          }
+          // }
         } else if(data[i].dp === undefined) {
           for(let i=0; i<5; i++) {
             ecgArray.push(undefined);
-            respiration.push(undefined);
           }
+          respiration.push(undefined);
         }
         
       } else if(data[i].index+1 > data[i+1].index || data[i+1].ts-data[i].ts > 100) {
-        const loseEcgData = ((data[i+1].ts - data[i].ts)/40);
-        const loseArray = Number(loseEcgData.toFixed(0))*5;
-        for(let count=0; count<loseArray; count++) {
+        const loseData = ((data[i + 1].ts - data[i].ts) / 40);
+        const resLoseArray = Number(loseData.toFixed(0));
+        const ecgLoseArray = Number(loseData.toFixed(0))*5;
+        for(let count=0; count<ecgLoseArray; count++) {
           ecgArray.push(undefined);
+        }
+        for (let j = 0; j < resLoseArray; j++) {
           if(data[i].dp.F1 === undefined || data[i].dp === undefined) respiration.push(undefined);
           else if(data[i].dp.F1 !== undefined || data[i].dp !== undefined) respiration.push(undefined);
         }
       }
     }
-    tsArray = [...ecgArray].map((v, i) => {
+    ecgTsArray = [...ecgArray].map((v, i) => {
       return (v = startTs + i * 8);
     });
 
+    resTsArray = [...respiration].map((v, i) => {
+      return v = startTs + i * 40;
+    })
+
     let dataArray = [...ecgArray].map((v:any, i) => {
-      return (v = { ts: tsArray[i], ecg: v });
+      return (v = { ts: ecgTsArray[i], ecg: v });
     });
 
     let respirationArray = [...respiration].map((v:any,i) => {
-      return v = { ts: tsArray[i], res: v };
+      return v = { ts: resTsArray[i], res: v };
     })
 
+
+    console.log(respirationArray)
 
     return {
       data: dataArray,
       respirationData: respirationArray,
-      start:  tsArray[0],
-      end: tsArray[tsArray.length-1],
+      start:  ecgTsArray[0],
+      end: ecgTsArray[ecgTsArray.length-1],
     };
   };
 

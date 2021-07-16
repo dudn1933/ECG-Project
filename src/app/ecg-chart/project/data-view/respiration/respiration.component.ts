@@ -20,8 +20,8 @@ export class RespirationComponent implements OnInit {
   
   ngOnChanges(changes: SimpleChanges): void {
     // if (!this.test) {
-      console.log('slice중')
-      this.dataArray = this.data.respirationData.slice(this.changeIndex[0], this.changeIndex[1] - 1);
+    // console.log('slice중')
+    this.dataArray = this.data.respirationData.slice(this.changeIndex[0]/5, (this.changeIndex[1] - 1)/5);
     // }
     // else if (this.test) {
     //   console.log("push중")
@@ -49,7 +49,7 @@ export class RespirationComponent implements OnInit {
 
     const yScale: any = d3
       .scaleLinear()
-      .range([height - margin.bottom, margin.top]);
+      .range([height-2 - margin.bottom, margin.top]);
       yScale.domain(d3.extent(this.dataArray, (d: any) => d.res));
 
     const xAxis = d3.axisBottom(xScale);
